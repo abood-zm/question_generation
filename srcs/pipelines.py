@@ -131,6 +131,8 @@ class QGPipeline:
     
     def _prepare_inputs_for_qg_from_answers_hl(self, sents, answers):
         inputs = []
+
+
         for i, answer in enumerate(answers):
             if len(answer) == 0: continue
             for answer_text in answer:
@@ -138,8 +140,16 @@ class QGPipeline:
                 sents_copy = sents[:]
                 
                 answer_text = answer_text.strip()
-                
+                sent = sent.strip()
+                sent = sent.lower()
+                answer_text = answer_text.lower()
+                answer_text = answer_text.replace('<pad>', '').strip()
+                sent = " ".join(sent.split())
+                print(sent)
+                if answer_text not in sent:
+                    continue
                 ans_start_idx = sent.index(answer_text)
+
                 
                 sent = f"{sent[:ans_start_idx]} <hl> {answer_text} <hl> {sent[ans_start_idx + len(answer_text): ]}"
                 sents_copy[i] = sent
@@ -307,10 +317,10 @@ SUPPORTED_TASKS = {
 
 def pipeline(
     task: str,
-    model: Optional = None,
+    model: Optional[any] = None,
     tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     qg_format: Optional[str] = "highlight",
-    ans_model: Optional = None,
+    ans_model: Optional[any] = None,
     ans_tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     use_cuda: Optional[bool] = True,
     **kwargs,
